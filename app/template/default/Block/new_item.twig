@@ -1,14 +1,12 @@
 {#
 This file is part of EC-CUBE
-
 Copyright(c) EC-CUBE CO.,LTD. All Rights Reserved.
-
 http://www.ec-cube.co.jp/
-
 For the full copyright and license information, please view the LICENSE
 file that was distributed with this source code.
 #}
-
+{% set Products = CustomizeNewProduct() %}
+{% if Products|length > 0 %}
 <div class="ec-role">
     <div class="ec-newItemRole">
         <div class="ec-newItemRole__list">
@@ -17,10 +15,11 @@ file that was distributed with this source code.
                     <span class="ec-secHeading__en">{{ 'front.block.new_item.title__en'|trans }}</span>
                     <span class="ec-secHeading__line"></span>
                     <span class="ec-secHeading__ja">{{ 'front.block.new_item.title__ja'|trans }}</span>
-                    <a class="ec-inlineBtn--top" href="{{ url('product_list') }}">{{ 'front.block.new_item.more'|trans }}</a>
+                    <a class="ec-inlineBtn--top" href="{{ url('product_list') }}?orderby={{eccube_config.eccube_product_order_newer}}">{{ 'front.block.new_item.more'|trans }}</a>
+                    {# <a class="ec-inlineBtn--top" href="{{ url('product_list') }}">{{ 'front.block.new_item.more'|trans }}</a> #}
                 </div>
             </div>
-            <div class="ec-newItemRole__listItem">
+            {# <div class="ec-newItemRole__listItem">
                 <a href="{{ url('product_detail', {'id': '1'}) }}">
                     <img src="{{ asset('cube-1.png', 'save_image') }}">
                     <p class="ec-newItemRole__listItemTitle">{{ 'front.block.new_item.item_1_name'|trans }}</p>
@@ -36,11 +35,31 @@ file that was distributed with this source code.
             </div>
             <div class="ec-newItemRole__listItem">
                 <a href="{{ url('product_detail', {'id': '1'}) }}">
-                    <img src="{{ asset('assets/img/top/new_ec.jpg' , 'user_data') }}">
+                    <img src="{{ asset(''|no_image_product , 'save_image') }}">
                     <p class="ec-newItemRole__listItemTitle">{{ 'front.block.new_item.item_3_name'|trans }}</p>
                     <p class="ec-newItemRole__listItemPrice">{{ 'front.block.new_item.item_3_price'|trans }}</p>
                 </a>
+            </div> #}
+            {% for Product in Products %}
+            <div class="ec-newItemRole__listItem">
+                <a href="{{ url('product_detail', {'id': Product.id}) }}">
+                    <img src="{{ asset(Product.main_list_image|no_image_product, 'save_image') }}">
+                    <p class="ec-newItemRole__listItemTitle">{{ Product.name }}</p>
+                    <p class="ec-newItemRole__listItemPrice">
+                    {% if Product.hasProductClass %}
+                        {% if Product.getPrice02Min == Product.getPrice02Max %}
+                            {{ Product.getPrice02IncTaxMin|price }}
+                        {% else %}
+                            {{ Product.getPrice02IncTaxMin|price }} ～ {{ Product.getPrice02IncTaxMax|price }}
+                        {% endif %}
+                    {% else %}
+                        {{ Product.getPrice02IncTaxMin|price }}
+                    {% endif %}
+                    </p>
+                </a>
             </div>
+            {% endfor %}
         </div>
     </div>
 </div>
+{% endif %}
